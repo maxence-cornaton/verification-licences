@@ -6,6 +6,7 @@ on:
 jobs:
   build-bin:
     runs-on: ubuntu-latest
+    container: debian:buster-slim
     steps:
       - run: lsb_release -a
       - uses: actions/checkout@v4
