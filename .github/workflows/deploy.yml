@@ -29,6 +29,7 @@ jobs:
           push: false
           tags: latest
           labels: verification-licences
+      - run: docker images
       - run: docker save verification-licences:latest > image.tar
       - name: Upload image as artifact
         uses: actions/upload-artifact@master
