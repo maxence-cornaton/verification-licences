@@ -4,73 +4,35 @@ on:
   push:
 
 jobs:
-  build-bin:
-    runs-on: ubuntu-latest
-    container: debian:buster-slim
-    steps:
-      - run: apt update
-      - run: apt install -y curl
-      - uses: actions/checkout@v4
-      - name: Install Rust
-        run: curl --proto '=https' --tlsv1.2 -sSf -o install.sh https://sh.rustup.rs && chmod +x install.sh && ./install.sh -y
-      - run:  . "$HOME/.cargo/env"
-      - name: Build
-        run: cargo build -r --verbose
-      - run: ldd ./target/release/verification-licences
-      - name: Upload bin as artifact
-        uses: actions/upload-artifact@master
-        with:
-          name: bin
-          path: ./target/release/verification-licences
-
-  build-wasm:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./wasm
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - name: Build
-        run: cargo build -r --verbose
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-      - name: Install wasm32 target
-        run: rustup target add wasm32-unknown-unknown
-      - name: Install wasm-bindgen-cli
-        run: cargo install wasm-bindgen-cli || true
-      - name: Build
-        run: cargo build -r --target=wasm32-unknown-unknown --verbose
-      - name: Generate bindings
-        run: wasm-bindgen --target=web --out-dir=pkg target/wasm32-unknown-unknown/release/wasm.wasm
-      - name: Upload WASM bindings as artifact
-        uses: actions/upload-artifact@master
-        with:
-          name: wasm-bindings
-          path: ./wasm/pkg
-
-  build-css:
+  build-docker-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
-      - uses: actions/checkout@v4
-      - name: Install Tailwind
-        run: npm install tailwindcss @tailwindcss/cli flowbite
-      - name: Build CSS
-        run: npx @tailwindcss/cli -i public/styles/styles.css -o styles.css --minify
-      - name: Upload CSS
-        uses: actions/upload-artifact@master
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          name: styles.css
-          path: ./styles.css
+          # list of Docker images to use as base name for tags
+          images: |
+            verification-licences
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - run: docker images
 
   deploy:
-    needs: [ build-bin, build-wasm, build-css ]
+    needs: [ build-docker-image ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
