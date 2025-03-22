@@ -12,7 +12,7 @@ jobs:
       - run: apt install -y curl
       - uses: actions/checkout@v4
       - name: Install Rust
-        run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
+        run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -y
       - run: ls /usr/lib64
       - run: ls /usr/include
       - name: Build
