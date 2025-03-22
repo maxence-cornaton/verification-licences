@@ -12,8 +12,11 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
+      - run: ls /usr/lib64
+      - run: ls /usr/include
       - name: Build
-        run: cargo build -r --verbose
+        run: OPENSSL_STATIC=1 OPENSSL_LIB_DIR=/usr/lib64 OPENSSL_INCLUDE_DIR=/usr/include/openssl cargo build -r --verbose
+      - run: ldd ./target/release/verification-licences
       - name: Upload bin as artifact
         uses: actions/upload-artifact@master
         with:
