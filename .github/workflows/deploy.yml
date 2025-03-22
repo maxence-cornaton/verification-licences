@@ -27,42 +27,33 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-      - run: docker images
+          tags: latest
+          labels: verification-licences
+      - run: docker save verification-licences:latest > image.tar
+      - name: Upload image as artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: image
+          path: ./image.tar
 
   deploy:
     needs: [ build-docker-image ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download bin artifact
+      - name: Download image
         uses: actions/download-artifact@master
         with:
-          name: bin
-          path: ./
-      - name: Download WASM bindings
-        uses: actions/download-artifact@master
-        with:
-          name: wasm-bindings
-          path: ./public/static/pkg
-      - name: Download CSS
-        uses: actions/download-artifact@master
-        with:
-          name: styles.css
-          path: ./public/static/styles.css
+          name: image
+          path: .
       - name: List files
         run: ls -al
-      - name: List static files
-        run: ls -al ./public/static
-      - name: List pkg files
-        run: ls -al ./public/static/pkg
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: "-rlgoDzvc -i --delete"
-          SOURCE: "Rocket.toml verification-licences public"
+          SOURCE: "image.tar"
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
