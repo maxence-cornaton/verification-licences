@@ -13,10 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Rust
         run: curl --proto '=https' --tlsv1.2 -sSf -o install.sh https://sh.rustup.rs && chmod +x install.sh && ./install.sh -y
-      - run: ls /usr/lib64
-      - run: ls /usr/include
       - name: Build
-        run: OPENSSL_STATIC=1 OPENSSL_LIB_DIR=/usr/lib64 OPENSSL_INCLUDE_DIR=/usr/include/openssl cargo build -r --verbose
+        run: cargo build -r --verbose
       - run: ldd ./target/release/verification-licences
       - name: Upload bin as artifact
         uses: actions/upload-artifact@master
