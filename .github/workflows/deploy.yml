@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: false
-          tags: latest
+          tags: verification-licences/latest
           labels: verification-licences
       - run: docker images
       - run: docker save verification-licences:latest > image.tar
