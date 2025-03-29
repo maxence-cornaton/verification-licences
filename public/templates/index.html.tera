@@ -3,6 +3,81 @@
 {% block content %}
     <div>
         <h1 class="index-title">Bienvenue sur le logiciel de vérification des licences de la CNM.</h1>
-        {% include "fileo/login-fragment" %}
+        <div>
+            L'objectif de ce logiciel est d'automatiser la vérification des licencié·e·s en amont des événements
+            officiels.
+            Pour ce faire, il propose actuellement 2 outils :
+            <ul>
+                <li><a href="/csv/check">Un module d'import de fichier CSV contenant la liste des membres à vérifier</a>
+                </li>
+                <li><a href="/uda/check">Un module d'import des participants à une compétition UDA (logiciel de gestion
+                        des événements développé par l'IUF)</a></li>
+            </ul>
+
+            La vérification des licences peut s'opérer sur plusieurs informations :
+            <ul>
+                <li>Le numéro de licence</li>
+                <li>L'identité (nom & prénom, dans un même champ)</li>
+                <li>Le nom et le prénom (dans 2 champs séparés)</li>
+            </ul>
+
+            Selon les informations fournies, un score de correspondance est retourné pour chaque vérification :
+            <ul>
+                <li>
+                    Si le numéro de licence est fourni :
+                    <ul>
+                        <li>S'il ne correspond à aucune licence connue, alors le membre sera considéré comme inconnu
+                        </li>
+                        <li>
+                            Si le numéro correspond à une licence, et que l'identité ou les nom et prénom fournis
+                            correspondent à ce membre, alors la vérification est considérée comme sûre
+                        </li>
+                        <li>
+                            Si le numéro correspond à une licence, et que l'identité ou les nom et prénom fournis ne
+                            correspondent pas à ce membre, alors la vérification est considérée comme partielle
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Si le numéro de licence n'est pas fourni :
+                    <ul>
+                        <li>
+                            Si l'identité ou les nom et prénom fournis correspondent à une licence, alors la
+                            vérification est considérée comme partielle
+                        </li>
+                        <li>
+                            Si l'identité ou les nom et prénom fournis ne correspondent à aucune licence, alors ce
+                            membre sera considéré comme inconnu
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <p>
+                Lors de l'étape de vérification, un membre dont la licence aura été partiellement validé aura un fond
+                orange. Dans ce cas, il est important de vérifier que les informations fournies sont cohérentes avec la
+                licence qui a été associée.
+            </p>
+            <p>
+                Il peut par exemple arriver qu'une famille échange entre ses membres les numéros de licence sans faire
+                exprès, ou alors qu'un membre a possédé 2 numéros de licence différents et utilise l'ancien à la place
+                du nouveau.
+            </p>
+
+            <div>
+                Par ailleurs, une fois la vérification effectuée, les membres sont classés selon leur statut :
+                <ul>
+                    <li>Licence à jour</li>
+                    <li>Licence expirée</li>
+                    <li>Licence inconnu</li>
+                </ul>
+                Actuellement, cette vérification s'opère à la date du jour. Si le besoin s'en fait ressentir,
+                il sera possible d'améliorer le logiciel afin de vérifier à une date donnée.
+            </div>
+            <div>
+                Pour terminer, il est possible d'envoyer un mail à tous les membres dont la licence a expiré,
+                voire à ceux dont la licence est à jour.
+                Le format du mail est libre, mais un mail-type est rempli par défaut.
+            </div>
+        </div>
     </div>
 {% endblock %}

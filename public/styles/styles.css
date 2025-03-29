@@ -326,3 +326,15 @@ button[disabled] {
 .index-title {
     @apply max-w-lg md:max-w-4xl mx-auto text-3xl py-5
 }
+
+:is(ol, ul):not(#nav-list) {
+    @apply list-disc list-inside
+}
+
+:is(ol, ul) :is(ol, ul) {
+    @apply ps-5 list-decimal list-inside
+}
+
+li > a {
+    @apply text-blue-600 dark:text-blue-500 hover:underline
+}
